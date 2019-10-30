@@ -13,22 +13,14 @@ public class Reimbursement {
 	private String reimbType;
 	private String reimbStatus;
 
+	public Reimbursement() {
+
+	}
+
 	public Reimbursement(int id, BigDecimal amount, Date submitted, Date resolved, String description, String receipt,
 			String reimbType, String reimbStatus) {
 		super();
 		this.id = id;
-		this.amount = amount;
-		this.submitted = submitted;
-		this.resolved = resolved;
-		this.description = description;
-		this.receipt = receipt;
-		this.reimbType = reimbType;
-		this.reimbStatus = reimbStatus;
-	}
-
-	public Reimbursement(BigDecimal amount, Date submitted, Date resolved, String description, String receipt,
-			String reimbType, String reimbStatus) {
-		super();
 		this.amount = amount;
 		this.submitted = submitted;
 		this.resolved = resolved;

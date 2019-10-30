@@ -9,20 +9,14 @@ public class User {
 	private String lastname;
 	private String role;
 
+	public User() {
+
+	}
+
 	public User(int id, String username, String password, String email, String firstname, String lastname,
 			String role) {
 		super();
 		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.role = role;
-	}
-
-	public User(String username, String password, String email, String firstname, String lastname, String role) {
-		super();
 		this.username = username;
 		this.password = password;
 		this.email = email;

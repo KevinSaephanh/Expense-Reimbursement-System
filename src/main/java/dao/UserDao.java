@@ -11,7 +11,7 @@ import utils.ConnectionUtil;
 public class UserDao {
 	public User getUser(String username, String password) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -20,9 +20,7 @@ public class UserDao {
 	}
 
 	public User createUser(User user) {
-		System.out.println("Jumping around");
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			System.out.println("Are we here?");
 			String sql = "INSERT INTO ers_users (user_name, pass_word, first_name, last_name, email, ers_user_role_id)"
 					+ "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -35,7 +33,6 @@ public class UserDao {
 			ps.setInt(6, 2); // Placeholder
 
 			ResultSet rs = ps.executeQuery();
-			System.out.println("Okay");
 			if (rs.next())
 				user.setId(rs.getInt("user_id"));
 		} catch (SQLException e) {

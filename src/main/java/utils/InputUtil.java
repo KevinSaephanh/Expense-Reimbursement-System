@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class InputValidation {
+import org.mindrot.jbcrypt.BCrypt;
+
+public class InputUtil {
 	private static final String USERNAME_PATTERN = "[a-zA-Z0-9\\\\._\\\\-]{2,20}";
 	private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*\\d).{7,50}$";
+	private static final int saltRounds = 10;
 	
 	public static boolean isValidAmount(BigDecimal amount) {
 		// Check if amount input is greater than 0
@@ -16,28 +19,30 @@ public class InputValidation {
 	}
 	
 	public static boolean isValidUsername(String username) {
-		// Check if username matches a specific pattern
-		if (getMatch(USERNAME_PATTERN, username))
-			return true;
-		return false;
+		boolean isMatch = getMatch(USERNAME_PATTERN, username);
+		return isMatch;
 	}
 	
 	public static boolean isValidPassword(String password) {
-		// Check if password matches a specific pattern
-		if (getMatch(PASSWORD_PATTERN, password))
-			return true;
-		return false;
+		boolean isMatch = getMatch(PASSWORD_PATTERN, password);
+		return isMatch;
 	}
 	
-	public static boolean comparePasswords(String input, String password) {
-		return false;
+	public static String hashPassword(String password) {
+		String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(saltRounds));
+		return hashedPassword;
+	}
+	
+	public static boolean comparePasswords(String candidatePassword, String hashedPassword) {
+		boolean isMatch = BCrypt.checkpw(candidatePassword, hashedPassword);
+		return isMatch;
 	}
 	
 	private static boolean getMatch(String inputPattern, String input) {
 		Pattern pattern = Pattern.compile(inputPattern);
 		Matcher matcher = pattern.matcher(input);
-		boolean match = matcher.matches();
+		boolean isMatch = matcher.matches();
 		
-		return match;
+		return isMatch;
 	}
 }

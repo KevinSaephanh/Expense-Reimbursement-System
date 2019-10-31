@@ -2,26 +2,28 @@ package services;
 
 import dao.UserDao;
 import models.User;
-import utils.InputValidation;
+import utils.InputUtil;
 
 public class UserService {
 	private UserDao userDao = new UserDao();
 	
 	public User signup(User user) {
-		System.out.println("We are here");
-		if (!InputValidation.isValidUsername(user.getUsername()) || 
-				!InputValidation.isValidPassword(user.getPassword())) {
+		// Validate username and password
+		if (!InputUtil.isValidUsername(user.getUsername()) || 
+				!InputUtil.isValidPassword(user.getPassword())) {
 			return null;
 		}
 		
-		System.out.println("Now we are here");
+		// Hash password
+		String hashedPassword = InputUtil.hashPassword(user.getPassword());
+		user.setPassword(hashedPassword);
+		
 		user = userDao.createUser(user);
 		return user;
 	}
 	
 	public User login(String username, String password) {
 		User user = userDao.getUser(username, password);
-		
 		return user;
 	}
 }

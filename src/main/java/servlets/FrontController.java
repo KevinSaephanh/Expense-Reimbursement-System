@@ -26,8 +26,8 @@ import services.UserService;
  * 		}
  * 
  * 		method getController (url) {
- * 			part = url.split("/")[2];
- * 			switch (part) {
+ * 			parse = url.split("/")[2];
+ * 			switch (parse) {
  * 				case a: return a;
  * 				case b: return b;
  * 				...
@@ -48,12 +48,20 @@ public class FrontController extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String route = req.getPathInfo();
-		System.out.println(route);
+		doPost(req, resp);
+	}
 
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doPost(req, resp);
+	}
+
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doPost(req, resp);
 	}
 
 	@Override
@@ -62,7 +70,10 @@ public class FrontController extends HttpServlet {
 		System.out.println(route);
 		System.out.println(req.getMethod());
 
-		// Move these to separate controllers
+		Controller c = getController(req.getPathInfo());
+		c.process(req, resp);
+
+		// Move these to separate controllers with switch case for method type
 		if (route.equals("/users/login")) {
 			ObjectMapper om = new ObjectMapper();
 			User user = om.readValue(req.getReader(), User.class);
@@ -81,6 +92,18 @@ public class FrontController extends HttpServlet {
 			// Call some service method that requires id
 		} else {
 			// 404?
+		}
+	}
+
+	private Controller getController(String url) {
+//		String parse = url.split("/")[2];
+		switch (url) {
+		case "/users/":
+			return new UserController();
+		case "/reimbursements/":
+			return new ReimbursementController();
+		default:
+			return null;
 		}
 	}
 }

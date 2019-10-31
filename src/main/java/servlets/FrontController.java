@@ -60,10 +60,15 @@ public class FrontController extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String route = req.getPathInfo();
 		System.out.println(route);
+		System.out.println(req.getMethod());
 
+		// Move these to separate controllers
 		if (route.equals("/users/login")) {
-//			ObjectMapper om = new ObjectMapper();
-//			User user = om.readValue(req.getReader(), User.class);
+			ObjectMapper om = new ObjectMapper();
+			User user = om.readValue(req.getReader(), User.class);
+			user = userService.login(user.getUsername(), user.getPassword());
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), user);
 		} else if (route.equals("/users/signup")) {
 			ObjectMapper om = new ObjectMapper();
 			User user = om.readValue(req.getReader(), User.class);

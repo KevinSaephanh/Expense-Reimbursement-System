@@ -28,4 +28,14 @@ public class UserService {
 			return user;
 		return null;
 	}
+	
+	public User updateUser(User user) {
+		user = userDao.updateUser(user);
+		return user;
+	}
+	
+	public int deleteUser(int id) {
+		int deleteCount = userDao.deleteUser(id);
+		return deleteCount;
+	}
 }

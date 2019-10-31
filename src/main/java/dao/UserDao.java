@@ -60,9 +60,14 @@ public class UserDao {
 		return null;
 	}
 
-	public int deleteUser(User user) {
+	public int deleteUser(int id) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			return 1;
+			String sql = "DELETE FROM ers_users WHERE user_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			
+			int deleteCount = ps.executeUpdate();
+			return deleteCount;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

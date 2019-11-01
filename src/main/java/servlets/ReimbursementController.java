@@ -1,11 +1,10 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -26,7 +25,6 @@ import services.ReimbursementService;
 public class ReimbursementController extends Controller {
 	ReimbursementService rs = new ReimbursementService();
 	private ObjectMapper om = new ObjectMapper();
-	private JSONObject jsonObject = new JSONObject();
 
 	@Override
 	public void process(HttpServletRequest req, HttpServletResponse resp)
@@ -36,16 +34,15 @@ public class ReimbursementController extends Controller {
 		int id = 0;
 
 		// Check if id was provided in URI
-		if (parse.length > 3) {
+		if (parse.length > 3)
 			id = Integer.parseInt(parse[3]);
-		}
 
 		switch (req.getMethod()) {
 		case "GET":
-			if (parse[2].equals("reimbursements"))
-				handleGetAll(req, resp);
-			else if (id != 0)
+			if (id != 0)
 				handleGet(req, resp, id);
+			else if (parse[2].equals("reimbursements"))
+				handleGetAll(req, resp);
 			break;
 		case "POST":
 			if (parse[2].equals("reimbursements"))
@@ -60,36 +57,42 @@ public class ReimbursementController extends Controller {
 		}
 	}
 
-	private void handleGetAll(HttpServletRequest req, HttpServletResponse resp) {
-		System.out.println("Are we here?");
-		rs.getAllReimbs();
-		System.out.println("It worked!");
+	private void handleGetAll(HttpServletRequest req, HttpServletResponse resp)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		List<Reimbursement> reimbs = rs.getAllReimbs();
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimbs);
 	}
 
-	private void handleGet(HttpServletRequest req, HttpServletResponse resp, int id) {
-
+	private void handleGet(HttpServletRequest req, HttpServletResponse resp, int id)
+			throws JsonParseException, JsonMappingException, IOException {
+		Reimbursement reimb = rs.getReimb(id);
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimb);
 	}
 
 	private void handleCreate(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonParseException, JsonMappingException, IOException {
 		Reimbursement reimb = om.readValue(req.getReader(), Reimbursement.class);
 		rs.createReimb(reimb);
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimb);
+	}
+
+	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id)
+			throws JsonParseException, JsonMappingException, IOException {
+		Reimbursement reimb = om.readValue(req.getReader(), Reimbursement.class);
+		reimb = rs.updateReimb(reimb.getId(), reimb.getResolverId(), reimb.getReimbStatusId());
 
 		// Set status and write json object
 		resp.setStatus(201);
 		om.writeValue(resp.getWriter(), reimb);
 	}
 
-	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id) {
-
-	}
-
 	private void handleDelete(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		int deleteCount = rs.deleteReimb(id);
-
 		if (deleteCount > 0) {
-			// Set status and write json object
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), "Reimbursement has been successfully deleted");
 		}

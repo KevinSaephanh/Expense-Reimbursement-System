@@ -14,8 +14,9 @@ public class ReimbursementService {
 		return reimbs;
 	}
 	
-	public Reimbursement getReimb() {
-		return null;
+	public Reimbursement getReimb(int id) {
+		Reimbursement reimb = rd.getReimb(id);
+		return reimb;
 	}
 	
 	public int createReimb(Reimbursement reimb) {

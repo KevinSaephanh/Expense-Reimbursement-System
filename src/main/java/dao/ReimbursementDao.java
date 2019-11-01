@@ -34,7 +34,22 @@ public class ReimbursementDao {
 		return null;
 	}
 
-	public Reimbursement getReimb() {
+	public Reimbursement getReimb(int id) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
+			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			
+			// Check if reimbursement was found
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				Reimbursement reimb = extractReimb(rs);
+				return reimb;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return null;
 	}
 
@@ -48,8 +63,8 @@ public class ReimbursementDao {
 			ps.setObject(2, LocalDateTime.now());
 			ps.setString(3, reimb.getDescription());
 			ps.setObject(4, reimb.getReceipt());
-			ps.setInt(5, reimb.getAuthorId());
-			ps.setInt(6, reimb.getReimbStatusId());
+			ps.setInt(5, reimb.getAuthorId()); 
+			ps.setInt(6, 1);
 			ps.setInt(7, reimb.getReimbTypeId());
 
 			int createCount = ps.executeUpdate();
@@ -64,7 +79,7 @@ public class ReimbursementDao {
 	public Reimbursement updateReimb(int reimbId, int resolverId, int statusId) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "UPDATE ers_reimbursements "
-					+ "SET resoved = ?, reimb_resolver = ?, reimb_status_id = ? WHERE reimb_id = ?";
+					+ "SET resolved = ?, reimb_resolver = ?, reimb_status_id = ? WHERE reimb_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			
 			ps.setObject(1, LocalDateTime.now());
@@ -72,6 +87,7 @@ public class ReimbursementDao {
 			ps.setInt(3, statusId);
 			ps.setInt(4, reimbId);
 			
+			// Check if reimbursement was updated
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				Reimbursement reimb = extractReimb(rs);
@@ -101,9 +117,9 @@ public class ReimbursementDao {
 	public Reimbursement extractReimb(ResultSet rs) throws SQLException {
 		int id = rs.getInt("reimb_id");
 		BigDecimal amount = rs.getBigDecimal("reimb_amount");
-		LocalDateTime submitted = (LocalDateTime) rs.getObject("reimb_submitted");
+		LocalDateTime submitted = rs.getTimestamp("reimb_submitted").toLocalDateTime();
 		LocalDateTime resolved = (LocalDateTime) rs.getObject("reimb_resolved");
-		String description = rs.getString("description");
+		String description = rs.getString("reimb_description");
 		Blob receipt = (Blob) rs.getObject("reimb_receipt");
 		int authorId = rs.getInt("reimb_author");
 		int resolverId = rs.getInt("reimb_resolver");

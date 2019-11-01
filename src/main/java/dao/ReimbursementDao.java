@@ -16,7 +16,7 @@ import utils.ConnectionUtil;
 public class ReimbursementDao {
 	public List<Reimbursement> getAllReimbs() {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursement";
+			String sql = "SELECT * FROM ers_reimbursements";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
@@ -40,7 +40,7 @@ public class ReimbursementDao {
 
 	public int createReimb(Reimbursement reimb) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "INSERT INTO ers_reimbursement "
+			String sql = "INSERT INTO ers_reimbursements"
 					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_receipt, reimb_author, reimb_status_id, reimb_type_id)"
 					+ " VALUES(?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -63,7 +63,7 @@ public class ReimbursementDao {
 
 	public Reimbursement updateReimb(int reimbId, int resolverId, int statusId) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "UPDATE ers_reimbursement "
+			String sql = "UPDATE ers_reimbursements "
 					+ "SET resoved = ?, reimb_resolver = ?, reimb_status_id = ? WHERE reimb_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			
@@ -86,7 +86,7 @@ public class ReimbursementDao {
 
 	public int deleteReimb(int id) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "DELETE FROM ers_reimbursement WHERE reimb_id = ?";
+			String sql = "DELETE FROM ers_reimbursements WHERE reimb_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
 			int deleteCount = ps.executeUpdate();

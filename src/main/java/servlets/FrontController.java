@@ -47,17 +47,14 @@ public class FrontController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String route = req.getPathInfo();
-		System.out.println(route);
-		System.out.println(req.getMethod());
-
 		Controller c = getController(route);
 		c.process(req, resp);
 	}
 
 	private Controller getController(String url) {
-		if (url.startsWith("/users/"))
+		if (url.startsWith("/users"))
 			return new UserController();
-		else if (url.startsWith("/reimbursements/"))
+		else if (url.startsWith("/reimbursements"))
 			return new ReimbursementController();
 		else
 			return null;

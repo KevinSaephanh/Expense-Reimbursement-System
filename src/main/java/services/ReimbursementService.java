@@ -22,13 +22,14 @@ public class ReimbursementService {
 		// Validate amount input
 		if (!InputUtil.isValidAmount(reimb.getAmount()))
 			return 0;
+		
 		int createCount = rd.createReimb(reimb);
 		return createCount;
 	}
 	
-	public Reimbursement updateReimb(int reimbId, int resolverId, int statusId) {
+	public Reimbursement updateReimb(int reimbId, int resolverId, int reimbStatusId) {
 		Reimbursement reimbursement = new Reimbursement();
-		reimbursement = rd.updateReimb(reimbId, resolverId, statusId);
+		reimbursement = rd.updateReimb(reimbId, resolverId, reimbStatusId);
 		return reimbursement;
 	}
 	

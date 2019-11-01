@@ -23,7 +23,7 @@ import services.ReimbursementService;
  * until some json (image, success, etc.) is sent to the client
  * */
 public class ReimbursementController extends Controller {
-	ReimbursementService rs = new ReimbursementService();
+	private ReimbursementService rs = new ReimbursementService();
 	private ObjectMapper om = new ObjectMapper();
 
 	@Override
@@ -31,35 +31,78 @@ public class ReimbursementController extends Controller {
 			throws JsonParseException, JsonMappingException, IOException {
 		String url = req.getRequestURI();
 		String[] parse = url.split("/");
-		int id = 0;
+		String reimbStatus = "";
+		int reimbId = 0;
+		int userId = 0;
 
-		// Check if id was provided in URI
-		if (parse.length > 3)
-			id = Integer.parseInt(parse[3]);
+		// Check for additional parameters in URI after 'reimbursements'
+		if (parse.length > 3 && parse[3].matches(".*\\d.*"))
+			reimbId = Integer.parseInt(parse[3]);
+		else if (parse.length > 4 && parse[3].matches("user") && parse[4].matches(".*\\d.*"))
+			userId = Integer.parseInt(parse[4].replaceAll("[\\D]", ""));
+		else if (parse.length > 3 && parse[3].matches("[a-zA-Z]+"))
+			reimbStatus = parse[3].toLowerCase();
 
+		// Call associated handler using request method
 		switch (req.getMethod()) {
 		case "GET":
-			if (id != 0)
-				handleGet(req, resp, id);
+			if (reimbStatus.equals("pending"))
+				handleGetPendingReimbs(req, resp);
+			else if (reimbStatus.equals("approved"))
+				handleGetApprovedReimbs(req, resp);
+			else if (reimbStatus.equals("denied"))
+				handleGetDeniedReimbs(req, resp);
+			else if (userId != 0)
+				handleGetUserReimbs(req, resp, userId);
+			else if (reimbId != 0)
+				handleGet(req, resp, reimbId);
 			else if (parse[2].equals("reimbursements"))
-				handleGetAll(req, resp);
+				handleGetAllReimbs(req, resp);
 			break;
 		case "POST":
 			if (parse[2].equals("reimbursements"))
 				handleCreate(req, resp);
 			break;
 		case "PUT":
-			handleUpdate(req, resp, id);
+			handleUpdate(req, resp, reimbId);
 			break;
 		case "DELETE":
-			handleDelete(req, resp, id);
+			handleDelete(req, resp, reimbId);
 			break;
 		}
 	}
 
-	private void handleGetAll(HttpServletRequest req, HttpServletResponse resp)
+	private void handleGetAllReimbs(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<Reimbursement> reimbs = rs.getAllReimbs();
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimbs);
+	}
+
+	private void handleGetPendingReimbs(HttpServletRequest req, HttpServletResponse resp)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		List<Reimbursement> reimbs = rs.getPendingReimbs();
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimbs);
+	}
+
+	private void handleGetApprovedReimbs(HttpServletRequest req, HttpServletResponse resp)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		List<Reimbursement> reimbs = rs.getApprovedReimbs();
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimbs);
+	}
+
+	private void handleGetDeniedReimbs(HttpServletRequest req, HttpServletResponse resp)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		List<Reimbursement> reimbs = rs.getDeniedReimbs();
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), reimbs);
+	}
+
+	private void handleGetUserReimbs(HttpServletRequest req, HttpServletResponse resp, int id)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		List<Reimbursement> reimbs = rs.getUserReimbs(id);
 		resp.setStatus(201);
 		om.writeValue(resp.getWriter(), reimbs);
 	}
@@ -82,7 +125,7 @@ public class ReimbursementController extends Controller {
 	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonParseException, JsonMappingException, IOException {
 		Reimbursement reimb = om.readValue(req.getReader(), Reimbursement.class);
-		reimb = rs.updateReimb(reimb.getId(), reimb.getResolverId(), reimb.getReimbStatusId());
+		reimb = rs.updateReimb(reimb, id);
 
 		// Set status and write json object
 		resp.setStatus(201);
@@ -92,6 +135,8 @@ public class ReimbursementController extends Controller {
 	private void handleDelete(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		int deleteCount = rs.deleteReimb(id);
+
+		// Check if a reimbursement was deleted
 		if (deleteCount > 0) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), "Reimbursement has been successfully deleted");

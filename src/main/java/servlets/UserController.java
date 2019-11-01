@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,27 +26,48 @@ public class UserController extends Controller {
 	public void process(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonParseException, JsonMappingException, IOException {
 		String url = req.getRequestURI();
-		String parse = url.split("/")[3];
+		String[] parse = url.split("/");
+		int id = 0;
 
-		resp.setContentType("application/json");
-		resp.setCharacterEncoding("UTF-8");
+		// Check if id was provided in URI
+		if (parse.length > 3 && parse[3].matches(".*\\d.*"))
+			id = Integer.parseInt(parse[3]);
 
+		// Call associated handler using request method
 		switch (req.getMethod()) {
 		case "GET":
+			if (id != 0)
+				handleGet(req, resp, id);
+			else if (parse[2].equals("users"))
+				handleGetAll(req, resp);
 			break;
 		case "POST":
-			if (parse.equals("signup"))
+			if (parse[3].equals("signup"))
 				handleSignup(req, resp);
-			else if (parse.equals("login"))
+			else if (parse[3].equals("login"))
 				handleLogin(req, resp);
 			break;
 		case "PUT":
-			handleUpdate(req, resp, Integer.parseInt(parse));
+			handleUpdate(req, resp, id);
 			break;
 		case "DELETE":
-			handleDelete(req, resp, Integer.parseInt(parse));
+			handleDelete(req, resp, id);
 			break;
 		}
+	}
+
+	private void handleGet(HttpServletRequest req, HttpServletResponse resp, int id)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		User user = userService.getUser(id);
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), user);
+	}
+
+	private void handleGetAll(HttpServletRequest req, HttpServletResponse resp)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		List<User> users = userService.getAllUsers();
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), users);
 	}
 
 	private void handleSignup(HttpServletRequest req, HttpServletResponse resp)
@@ -68,21 +90,28 @@ public class UserController extends Controller {
 
 		// Set status and write json object
 		resp.setStatus(201);
+		jsonObject.put("id", user.getId());
 		jsonObject.put("user", user.getUsername());
 		jsonObject.put("token", token);
 		om.writeValue(resp.getWriter(), jsonObject.toString());
 	}
 
-	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id) {
-		
+	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id)
+			throws JsonParseException, JsonMappingException, IOException {
+		User user = om.readValue(req.getReader(), User.class);
+		user = userService.updateUser(user, id);
+
+		// Set status and write json object
+		resp.setStatus(201);
+		om.writeValue(resp.getWriter(), user);
 	}
 
 	private void handleDelete(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		int deleteCount = userService.deleteUser(id);
 
+		// Check if a user was deleted
 		if (deleteCount > 0) {
-			// Set status and write json object
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), "User has been successfully deleted");
 		}

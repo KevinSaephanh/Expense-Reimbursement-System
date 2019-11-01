@@ -7,15 +7,35 @@ import models.Reimbursement;
 import utils.InputUtil;
 
 public class ReimbursementService {
-	private ReimbursementDao rd = new ReimbursementDao();
+	private ReimbursementDao reimbDao = new ReimbursementDao();
 	
 	public List<Reimbursement> getAllReimbs() {
-		List<Reimbursement> reimbs = rd.getAllReimbs();
+		List<Reimbursement> reimbs = reimbDao.getAllReimbs();
+		return reimbs;
+	}
+	
+	public List<Reimbursement> getPendingReimbs() {
+		List<Reimbursement> reimbs = reimbDao.getPendingReimbs();
+		return reimbs;
+	}
+	
+	public List<Reimbursement> getApprovedReimbs() {
+		List<Reimbursement> reimbs = reimbDao.getApprovedReimbs();
+		return reimbs;
+	}
+	
+	public List<Reimbursement> getDeniedReimbs() {
+		List<Reimbursement> reimbs = reimbDao.getDeniedReimbs();
+		return reimbs;
+	}
+	
+	public List<Reimbursement> getUserReimbs(int id) {
+		List<Reimbursement> reimbs = reimbDao.getUserReimbs(id);
 		return reimbs;
 	}
 	
 	public Reimbursement getReimb(int id) {
-		Reimbursement reimb = rd.getReimb(id);
+		Reimbursement reimb = reimbDao.getReimb(id);
 		return reimb;
 	}
 	
@@ -24,18 +44,17 @@ public class ReimbursementService {
 		if (!InputUtil.isValidAmount(reimb.getAmount()))
 			return 0;
 		
-		int createCount = rd.createReimb(reimb);
+		int createCount = reimbDao.createReimb(reimb);
 		return createCount;
 	}
 	
-	public Reimbursement updateReimb(int reimbId, int resolverId, int reimbStatusId) {
-		Reimbursement reimbursement = new Reimbursement();
-		reimbursement = rd.updateReimb(reimbId, resolverId, reimbStatusId);
-		return reimbursement;
+	public Reimbursement updateReimb(Reimbursement reimb, int id) {
+		reimb = reimbDao.updateReimb(reimb, id);
+		return reimb;
 	}
 	
 	public int deleteReimb(int id) {
-		int deleteCount = rd.deleteReimb(id);
+		int deleteCount = reimbDao.deleteReimb(id);
 		return deleteCount;
 	}
 }

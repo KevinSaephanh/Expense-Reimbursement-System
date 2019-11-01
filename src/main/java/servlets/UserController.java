@@ -26,7 +26,6 @@ public class UserController extends Controller {
 			throws JsonParseException, JsonMappingException, IOException {
 		String url = req.getRequestURI();
 		String parse = url.split("/")[3];
-		System.out.println("This is the parsed url " + parse);
 
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
@@ -41,6 +40,8 @@ public class UserController extends Controller {
 				handleLogin(req, resp);
 			break;
 		case "PUT":
+			handleUpdate(req, resp, Integer.parseInt(parse));
+			break;
 		case "DELETE":
 			handleDelete(req, resp, Integer.parseInt(parse));
 			break;
@@ -72,18 +73,18 @@ public class UserController extends Controller {
 		om.writeValue(resp.getWriter(), jsonObject.toString());
 	}
 
-	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp) {
+	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id) {
 		
 	}
 
 	private void handleDelete(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		int deleteCount = userService.deleteUser(id);
-		
+
 		if (deleteCount > 0) {
 			// Set status and write json object
 			resp.setStatus(201);
-			om.writeValue(resp.getWriter(), "User has been successfully deleted");	
+			om.writeValue(resp.getWriter(), "User has been successfully deleted");
 		}
 	}
 }

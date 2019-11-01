@@ -8,30 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/*
- * FrontController
- * 		Controller A, B, C, etc.
- * 
- * Do this in FrontController
- * 		Controller c = getController (url)
- * 		String method = getMethod(req.getMethodType())
- * 		switch (method) {
- * 			case "get": c.get(req, res); break;
- * 			case "post": c.post(req, res); break;
- * 			...
- * 		}
- * 
- * 		method getController (url) {
- * 			parse = url.split("/")[2];
- * 			switch (parse) {
- * 				case a: return a;
- * 				case b: return b;
- * 				...
- * 			}
- * 		}
- * 
- * */
-
 @WebServlet(name = "FrontController", urlPatterns = "/*")
 public class FrontController extends HttpServlet {
 	@Override
@@ -42,6 +18,15 @@ public class FrontController extends HttpServlet {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		super.service(req, resp);
+
+		// Set CORS access
+		resp.setHeader("Access-Control-Allow-Origin", "*");
+		resp.setHeader("Access-Control-Allow-Headers", "*");
 	}
 
 	@Override
@@ -65,7 +50,7 @@ public class FrontController extends HttpServlet {
 		System.out.println(route);
 		System.out.println(req.getMethod());
 
-		Controller c = getController(req.getPathInfo());
+		Controller c = getController(route);
 		c.process(req, resp);
 	}
 

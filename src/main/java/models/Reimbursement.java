@@ -1,24 +1,36 @@
 package models;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.sql.Blob;
+import java.time.LocalDateTime;
 
 public class Reimbursement {
 	private int id;
 	private BigDecimal amount;
-	private Date submitted;
-	private Date resolved;
+	private LocalDateTime submitted;
+	private LocalDateTime resolved;
 	private String description;
-	private String receipt;
-	private String reimbType;
-	private String reimbStatus;
+	private Blob receipt;
+	private int authorId;
+	private int resolverId;
+	private int reimbTypeId;
+	private int reimbStatusId;
 
 	public Reimbursement() {
 
 	}
 
-	public Reimbursement(int id, BigDecimal amount, Date submitted, Date resolved, String description, String receipt,
-			String reimbType, String reimbStatus) {
+	public Reimbursement(BigDecimal amount, String description, int authorId, int reimbTypeId, int reimbStatusId) {
+		super();
+		this.amount = amount;
+		this.description = description;
+		this.authorId = authorId;
+		this.reimbTypeId = reimbTypeId;
+		this.reimbStatusId = reimbStatusId;
+	}
+
+	public Reimbursement(int id, BigDecimal amount, LocalDateTime submitted, LocalDateTime resolved, String description,
+			Blob receipt, int authorId, int resolverId, int reimbTypeId, int reimbStatusId) {
 		super();
 		this.id = id;
 		this.amount = amount;
@@ -26,8 +38,10 @@ public class Reimbursement {
 		this.resolved = resolved;
 		this.description = description;
 		this.receipt = receipt;
-		this.reimbType = reimbType;
-		this.reimbStatus = reimbStatus;
+		this.authorId = authorId;
+		this.resolverId = resolverId;
+		this.reimbTypeId = reimbTypeId;
+		this.reimbStatusId = reimbStatusId;
 	}
 
 	public int getId() {
@@ -46,19 +60,19 @@ public class Reimbursement {
 		this.amount = amount;
 	}
 
-	public Date getSubmitted() {
+	public LocalDateTime getSubmitted() {
 		return submitted;
 	}
 
-	public void setSubmitted(Date submitted) {
+	public void setSubmitted(LocalDateTime submitted) {
 		this.submitted = submitted;
 	}
 
-	public Date getResolved() {
+	public LocalDateTime getResolved() {
 		return resolved;
 	}
 
-	public void setResolved(Date resolved) {
+	public void setResolved(LocalDateTime resolved) {
 		this.resolved = resolved;
 	}
 
@@ -70,28 +84,44 @@ public class Reimbursement {
 		this.description = description;
 	}
 
-	public String getReceipt() {
+	public Blob getReceipt() {
 		return receipt;
 	}
 
-	public void setReceipt(String receipt) {
+	public void setReceipt(Blob receipt) {
 		this.receipt = receipt;
 	}
 
-	public String getreimbType() {
-		return reimbType;
+	public int getAuthorId() {
+		return authorId;
 	}
 
-	public void setreimbType(String reimbType) {
-		this.reimbType = reimbType;
+	public void setAuthorId(int authorId) {
+		this.authorId = authorId;
 	}
 
-	public String getreimbStatus() {
-		return reimbStatus;
+	public int getResolverId() {
+		return resolverId;
 	}
 
-	public void setreimbStatus(String reimbStatus) {
-		this.reimbStatus = reimbStatus;
+	public void setResolverId(int resolverId) {
+		this.resolverId = resolverId;
+	}
+
+	public int getReimbTypeId() {
+		return reimbTypeId;
+	}
+
+	public void setReimbTypeId(int reimbTypeId) {
+		this.reimbTypeId = reimbTypeId;
+	}
+
+	public int getReimbStatusId() {
+		return reimbStatusId;
+	}
+
+	public void setReimbStatusId(int reimbStatusId) {
+		this.reimbStatusId = reimbStatusId;
 	}
 
 	@Override
@@ -99,12 +129,14 @@ public class Reimbursement {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+		result = prime * result + authorId;
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + id;
 		result = prime * result + ((receipt == null) ? 0 : receipt.hashCode());
+		result = prime * result + reimbStatusId;
+		result = prime * result + reimbTypeId;
 		result = prime * result + ((resolved == null) ? 0 : resolved.hashCode());
-		result = prime * result + ((reimbStatus == null) ? 0 : reimbStatus.hashCode());
-		result = prime * result + ((reimbType == null) ? 0 : reimbType.hashCode());
+		result = prime * result + resolverId;
 		result = prime * result + ((submitted == null) ? 0 : submitted.hashCode());
 		return result;
 	}
@@ -123,6 +155,8 @@ public class Reimbursement {
 				return false;
 		} else if (!amount.equals(other.amount))
 			return false;
+		if (authorId != other.authorId)
+			return false;
 		if (description == null) {
 			if (other.description != null)
 				return false;
@@ -135,14 +169,16 @@ public class Reimbursement {
 				return false;
 		} else if (!receipt.equals(other.receipt))
 			return false;
+		if (reimbStatusId != other.reimbStatusId)
+			return false;
+		if (reimbTypeId != other.reimbTypeId)
+			return false;
 		if (resolved == null) {
 			if (other.resolved != null)
 				return false;
 		} else if (!resolved.equals(other.resolved))
 			return false;
-		if (reimbStatus != other.reimbStatus)
-			return false;
-		if (reimbType != other.reimbType)
+		if (resolverId != other.resolverId)
 			return false;
 		if (submitted == null) {
 			if (other.submitted != null)
@@ -155,8 +191,8 @@ public class Reimbursement {
 	@Override
 	public String toString() {
 		return "Reimbursement [id=" + id + ", amount=" + amount + ", submitted=" + submitted + ", resolved=" + resolved
-				+ ", description=" + description + ", receipt=" + receipt + ", reimbType=" + reimbType
-				+ ", reimbStatus=" + reimbStatus + "]";
+				+ ", description=" + description + ", receipt=" + receipt + ", authorId=" + authorId + ", resolverId="
+				+ resolverId + ", reimbTypeId=" + reimbTypeId + ", reimbStatusId=" + reimbStatusId + "]";
 	}
 
 }

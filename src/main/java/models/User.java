@@ -7,14 +7,13 @@ public class User {
 	private String email;
 	private String firstname;
 	private String lastname;
-	private String role;
+	private int roleId;
 
 	public User() {
 
 	}
 
-	public User(int id, String username, String password, String email, String firstname, String lastname,
-			String role) {
+	public User(int id, String username, String password, String email, String firstname, String lastname, int roleId) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -22,7 +21,7 @@ public class User {
 		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
-		this.role = role;
+		this.roleId = roleId;
 	}
 
 	public int getId() {
@@ -73,12 +72,12 @@ public class User {
 		this.lastname = lastname;
 	}
 
-	public String getRole() {
-		return role;
+	public int getroleId() {
+		return roleId;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setroleId(int roleIdId) {
+		this.roleId = roleIdId;
 	}
 
 	@Override
@@ -90,7 +89,7 @@ public class User {
 		result = prime * result + id;
 		result = prime * result + ((lastname == null) ? 0 : lastname.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
-		result = prime * result + ((role == null) ? 0 : role.hashCode());
+		result = prime * result + roleId;
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
@@ -126,7 +125,7 @@ public class User {
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
-		if (role != other.role)
+		if (roleId != other.roleId)
 			return false;
 		if (username == null) {
 			if (other.username != null)
@@ -139,7 +138,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", password=" + password + ", email=" + email
-				+ ", firstname=" + firstname + ", lastname=" + lastname + ", role=" + role + "]";
+				+ ", firstname=" + firstname + ", lastname=" + lastname + ", roleId=" + roleId + "]";
 	}
 
 }

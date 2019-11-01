@@ -23,7 +23,7 @@ public class UserService {
 	}
 
 	public User login(String username, String password) {
-		User user = userDao.getUser(username, password);
+		User user = userDao.getUser(username);
 		if (AuthUtil.comparePasswords(password, user.getPassword()))
 			return user;
 		return null;

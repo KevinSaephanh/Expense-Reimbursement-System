@@ -9,7 +9,7 @@ import models.User;
 import utils.ConnectionUtil;
 
 public class UserDao {
-	public User getUser(String username, String password) {
+	public User getUser(String username) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "SELECT * FROM ers_users WHERE user_name = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -83,14 +83,8 @@ public class UserDao {
 		String firstname = rs.getString("first_name");
 		String lastname = rs.getString("last_name");
 		int role_id = rs.getInt("ers_user_role_id");
-		String role = "";
 
-		if (role_id == 1)
-			role = "Employee";
-		else if (role_id == 2)
-			role = "Manager";
-
-		User user = new User(id, username, password, email, firstname, lastname, role);
+		User user = new User(id, username, password, email, firstname, lastname, role_id);
 		return user;
 	}
 }

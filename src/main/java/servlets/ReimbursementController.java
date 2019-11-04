@@ -75,51 +75,100 @@ public class ReimbursementController extends Controller {
 	private void handleGetAllReimbs(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<Reimbursement> reimbs = rs.getAllReimbs();
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimbs);
+
+		// Set status and write json object
+		if (reimbs != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimbs);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
+		}
 	}
 
 	private void handleGetPendingReimbs(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<Reimbursement> reimbs = rs.getPendingReimbs();
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimbs);
+
+		// Set status and write json object
+		if (reimbs != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimbs);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
+		}
 	}
 
 	private void handleGetApprovedReimbs(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<Reimbursement> reimbs = rs.getApprovedReimbs();
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimbs);
+
+		// Set status and write json object
+		if (reimbs != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimbs);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
+		}
 	}
 
 	private void handleGetDeniedReimbs(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<Reimbursement> reimbs = rs.getDeniedReimbs();
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimbs);
+
+		// Set status and write json object
+		if (reimbs != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimbs);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
+		}
 	}
 
 	private void handleGetUserReimbs(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<Reimbursement> reimbs = rs.getUserReimbs(id);
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimbs);
+
+		// Set status and write json object
+		if (reimbs != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimbs);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "No reimbursement tickets available for this user");
+		}
 	}
 
 	private void handleGet(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonParseException, JsonMappingException, IOException {
 		Reimbursement reimb = rs.getReimb(id);
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimb);
+
+		// Set status and write json object
+		if (reimb != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimb);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "Could not retrieve the reimbursement");
+		}
 	}
 
 	private void handleCreate(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonParseException, JsonMappingException, IOException {
 		Reimbursement reimb = om.readValue(req.getReader(), Reimbursement.class);
-		rs.createReimb(reimb);
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimb);
+		int createCount = rs.createReimb(reimb);
+
+		// Set status and write json object
+		if (createCount > 0) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimb);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "Failed to submit the reimbursement ticket");
+		}
 	}
 
 	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id)
@@ -128,8 +177,13 @@ public class ReimbursementController extends Controller {
 		reimb = rs.updateReimb(reimb, id);
 
 		// Set status and write json object
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), reimb);
+		if (reimb != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), reimb);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "Failed to update the reimbursement ticket");
+		}
 	}
 
 	private void handleDelete(HttpServletRequest req, HttpServletResponse resp, int id)

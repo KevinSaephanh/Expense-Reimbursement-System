@@ -59,15 +59,29 @@ public class UserController extends Controller {
 	private void handleGet(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		User user = userService.getUser(id);
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), user);
+
+		// Set status and write json object
+		if (user != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), user);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "Could not retrieve user");
+		}
 	}
 
 	private void handleGetAll(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		List<User> users = userService.getAllUsers();
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), users);
+
+		// Set status and write json object
+		if (users != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), users);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "No users in the database");
+		}
 	}
 
 	private void handleSignup(HttpServletRequest req, HttpServletResponse resp)
@@ -76,8 +90,13 @@ public class UserController extends Controller {
 		user = userService.signup(user);
 
 		// Set status and write json object
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), user);
+		if (user != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), user);
+		} else {
+			resp.setStatus(400);
+			// Write some meaningful json object
+		}
 	}
 
 	private void handleLogin(HttpServletRequest req, HttpServletResponse resp)
@@ -85,15 +104,27 @@ public class UserController extends Controller {
 		User user = om.readValue(req.getReader(), User.class);
 		user = userService.login(user.getUsername(), user.getPassword());
 
-		// Generate token
-		String token = AuthUtil.generateToken(user);
-
 		// Set status and write json object
-		resp.setStatus(201);
-		jsonObject.put("id", user.getId());
-		jsonObject.put("user", user.getUsername());
-		jsonObject.put("token", token);
-		om.writeValue(resp.getWriter(), jsonObject.toString());
+		if (user != null) {
+			// Generate token
+			String token = AuthUtil.generateToken(user);
+
+			resp.setStatus(201);
+			jsonObject.put("id", user.getId());
+			jsonObject.put("user", user.getUsername());
+			jsonObject.put("token", token);
+
+			// Send user role as string
+			if (user.getroleId() == 1)
+				jsonObject.put("role", "Employee");
+			else if (user.getroleId() == 2)
+				jsonObject.put("role", "Manager");
+
+			om.writeValue(resp.getWriter(), jsonObject.toString());
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "Incorrect username/password");
+		}
 	}
 
 	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id)
@@ -102,8 +133,13 @@ public class UserController extends Controller {
 		user = userService.updateUser(user, id);
 
 		// Set status and write json object
-		resp.setStatus(201);
-		om.writeValue(resp.getWriter(), user);
+		if (user != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), user);
+		} else {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "User could not be updated");
+		}
 	}
 
 	private void handleDelete(HttpServletRequest req, HttpServletResponse resp, int id)

@@ -218,6 +218,7 @@ public class ReimbursementDao {
 		int statusId = rs.getInt("reimb_status_id");
 		int reimbTypeId = rs.getInt("reimb_type_id");
 		
+		// If reimbursement was already resolved (not null), convert it to LocalDateTime
 		LocalDateTime resolvedLDT = null;
 		if (resolved != null)
 			resolvedLDT = resolved.toLocalDateTime();

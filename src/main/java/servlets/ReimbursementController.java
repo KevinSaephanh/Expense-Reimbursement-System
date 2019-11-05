@@ -35,6 +35,13 @@ public class ReimbursementController extends Controller {
 		int reimbId = 0;
 		int userId = 0;
 
+		// Set CORS access
+		resp.setHeader("Access-Control-Allow-Origin", "*");
+		resp.setHeader("Access-Control-Allow-Credentials", "true");
+		resp.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+		resp.setHeader("Access-Control-Allow-Headers",
+				"Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
 		// Check for additional parameters in URI after 'reimbursements'
 		if (parse.length > 3 && parse[3].matches(".*\\d.*"))
 			reimbId = Integer.parseInt(parse[3]);

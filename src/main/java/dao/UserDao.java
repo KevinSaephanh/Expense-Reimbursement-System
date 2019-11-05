@@ -81,7 +81,7 @@ public class UserDao {
 			ps.setString(3, user.getFirstname());
 			ps.setString(4, user.getLastname());
 			ps.setString(5, user.getEmail());
-			ps.setInt(6, user.getroleId());
+			ps.setInt(6, user.getRoleId());
 
 			ResultSet rs = ps.executeQuery();
 			if (rs.next())
@@ -105,7 +105,7 @@ public class UserDao {
 			ps.setString(3, user.getFirstname());
 			ps.setString(4, user.getLastname());
 			ps.setString(5, user.getEmail());
-			ps.setInt(6, user.getroleId());
+			ps.setInt(6, user.getRoleId());
 			ps.setInt(7, id);
 
 			// Check if user was updated
@@ -115,7 +115,7 @@ public class UserDao {
 				int roleId = rs.getInt("ers_user_role_id");
 				
 				user.setUsername(username);
-				user.setroleId(roleId);
+				user.setRoleId(roleId);
 				return user;
 			}
 		} catch (SQLException e) {

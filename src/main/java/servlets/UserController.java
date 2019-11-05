@@ -6,8 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONObject;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -20,7 +18,6 @@ import utils.AuthUtil;
 public class UserController extends Controller {
 	private UserService userService = new UserService();
 	private ObjectMapper om = new ObjectMapper();
-	private JSONObject jsonObject = new JSONObject();
 
 	@Override
 	public void process(HttpServletRequest req, HttpServletResponse resp)
@@ -28,6 +25,13 @@ public class UserController extends Controller {
 		String url = req.getRequestURI();
 		String[] parse = url.split("/");
 		int id = 0;
+
+		// Set CORS access
+		resp.setHeader("Access-Control-Allow-Origin", "*");
+		resp.setHeader("Access-Control-Allow-Credentials", "true");
+		resp.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+		resp.setHeader("Access-Control-Allow-Headers",
+				"Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
 		// Check if id was provided in URI
 		if (parse.length > 3 && parse[3].matches(".*\\d.*"))
@@ -108,19 +112,9 @@ public class UserController extends Controller {
 		if (user != null) {
 			// Generate token
 			String token = AuthUtil.generateToken(user);
-
+			
 			resp.setStatus(201);
-			jsonObject.put("id", user.getId());
-			jsonObject.put("user", user.getUsername());
-			jsonObject.put("token", token);
-
-			// Send user role as string
-			if (user.getroleId() == 1)
-				jsonObject.put("role", "Employee");
-			else if (user.getroleId() == 2)
-				jsonObject.put("role", "Manager");
-
-			om.writeValue(resp.getWriter(), jsonObject.toString());
+			om.writeValue(resp.getWriter(), token);
 		} else {
 			resp.setStatus(400);
 			om.writeValue(resp.getWriter(), "Incorrect username/password");

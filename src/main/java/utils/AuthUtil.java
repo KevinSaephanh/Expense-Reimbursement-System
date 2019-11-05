@@ -7,14 +7,13 @@ import javax.xml.bind.DatatypeConverter;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import models.User;
 
 public class AuthUtil {
 	public static final String SECRET = System.getenv("SECRET");
-	
+
 	public static String hashPassword(String password) {
 		String hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray());
 		return hashedPassword;
@@ -26,24 +25,24 @@ public class AuthUtil {
 	}
 
 	public static String generateToken(User user) {
-		SignatureAlgorithm sa = SignatureAlgorithm.HS256;
-		Date now = new Date(System.currentTimeMillis());
-		long expiresIn = 3600000;
+		Date issuedAt = new Date(System.currentTimeMillis());
+		long expiresIn = System.currentTimeMillis() + 3600000;
 		Date expirationDate = new Date(expiresIn);
 
-		// Sign token with ApiKey secret
+		// Sign token with API Key secret
+		SignatureAlgorithm sa = SignatureAlgorithm.HS256;
 		byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET);
 		SecretKeySpec signingKey = new SecretKeySpec(apiKeySecretBytes, sa.getJcaName());
 
 		// Build token and serialize it to a compact, URL-safe string
-		JwtBuilder builder = Jwts.builder().setIssuedAt(now).setSubject(user.getUsername())
-				.setExpiration(expirationDate).signWith(sa, signingKey);
-		return builder.compact();
+		String jwt = Jwts.builder().setIssuedAt(issuedAt).setSubject(user.getUsername()).setExpiration(expirationDate)
+				.signWith(sa, signingKey).claim("role", user.getRoleId()).claim("id", user.getId()).compact();
+		return jwt;
 	}
 
 	public static Claims verifyToken(String token) {
-		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(SECRET))
-				.parseClaimsJws(token).getBody();
+		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(SECRET)).parseClaimsJws(token)
+				.getBody();
 		return claims;
 	}
 }

@@ -72,12 +72,12 @@ public class User {
 		this.lastname = lastname;
 	}
 
-	public int getroleId() {
+	public int getRoleId() {
 		return roleId;
 	}
 
-	public void setroleId(int roleIdId) {
-		this.roleId = roleIdId;
+	public void setRoleId(int roleId) {
+		this.roleId = roleId;
 	}
 
 	@Override

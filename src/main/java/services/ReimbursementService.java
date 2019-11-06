@@ -9,23 +9,8 @@ import utils.InputUtil;
 public class ReimbursementService {
 	private ReimbursementDao reimbDao = new ReimbursementDao();
 	
-	public List<Reimbursement> getAllReimbs() {
-		List<Reimbursement> reimbs = reimbDao.getAllReimbs();
-		return reimbs;
-	}
-	
-	public List<Reimbursement> getPendingReimbs() {
-		List<Reimbursement> reimbs = reimbDao.getPendingReimbs();
-		return reimbs;
-	}
-	
-	public List<Reimbursement> getApprovedReimbs() {
-		List<Reimbursement> reimbs = reimbDao.getApprovedReimbs();
-		return reimbs;
-	}
-	
-	public List<Reimbursement> getDeniedReimbs() {
-		List<Reimbursement> reimbs = reimbDao.getDeniedReimbs();
+	public List<Reimbursement> getAllReimbs(int pageNum) {
+		List<Reimbursement> reimbs = reimbDao.getAllReimbs(pageNum);
 		return reimbs;
 	}
 	

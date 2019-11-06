@@ -53,7 +53,7 @@ public class UserDao {
 	// Used for login
 	public User getUser(String username) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_users WHERE user_name = ?";
+			String sql = "SELECT * FROM ers_users WHERE LOWER(user_name) = LOWER(?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, username);
 

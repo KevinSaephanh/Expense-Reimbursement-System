@@ -31,7 +31,7 @@ public class AuthUtil {
 
 		// Sign token with API Key secret
 		SignatureAlgorithm sa = SignatureAlgorithm.HS256;
-		byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET);
+		byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary("helloworld");
 		SecretKeySpec signingKey = new SecretKeySpec(apiKeySecretBytes, sa.getJcaName());
 
 		// Build token and serialize it to a compact, URL-safe string

@@ -20,15 +20,6 @@ public class Reimbursement {
 
 	}
 
-	public Reimbursement(BigDecimal amount, String description, int authorId, int reimbTypeId, int reimbStatusId) {
-		super();
-		this.amount = amount;
-		this.description = description;
-		this.authorId = authorId;
-		this.reimbTypeId = reimbTypeId;
-		this.reimbStatusId = reimbStatusId;
-	}
-
 	public Reimbursement(int id, BigDecimal amount, LocalDateTime submitted, LocalDateTime resolved, String description,
 			Blob receipt, int authorId, int resolverId, int reimbTypeId, int reimbStatusId) {
 		super();

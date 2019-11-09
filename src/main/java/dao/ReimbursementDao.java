@@ -13,6 +13,7 @@ import java.util.List;
 
 import models.Reimbursement;
 import utils.ConnectionUtil;
+
 // Use pagination when getting ALL reimbursements (because the dataset may be too large)
 // SELECT * FROM ers_reimbursements LIMIT 20 OFFSET (page_num taken from parameter * LIMIT SIZE)
 // When user selects next on some table/list, a query will be sent to the server to query another
@@ -24,7 +25,7 @@ public class ReimbursementDao {
 			PreparedStatement statement = conn.prepareStatement(sql);
 			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();
-			
+
 			// Extract all user reimbursements and add to list
 			List<Reimbursement> reimbs = new ArrayList<>();
 			while (rs.next()) {
@@ -38,71 +39,13 @@ public class ReimbursementDao {
 
 		return null;
 	}
-	
-	public List<Reimbursement> getPendingReimbs() {
-		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_status_id = 1";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			ResultSet rs = statement.executeQuery();
-			
-			// Extract all reimbursements and add to list
-			List<Reimbursement> reimbs = new ArrayList<>();
-			while (rs.next()) {
-				Reimbursement reimb = extractReimb(rs);
-				reimbs.add(reimb);
-			}
-			return reimbs;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 
-		return null;
-	}
-	
-	public List<Reimbursement> getApprovedReimbs() {
+	public List<Reimbursement> getAllReimbs(int pageNum) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_status_id = 2";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			ResultSet rs = statement.executeQuery();
-			
-			// Extract all reimbursements and add to list
-			List<Reimbursement> reimbs = new ArrayList<>();
-			while (rs.next()) {
-				Reimbursement reimb = extractReimb(rs);
-				reimbs.add(reimb);
-			}
-			return reimbs;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-	
-	public List<Reimbursement> getDeniedReimbs() {
-		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_status_id = 3";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			ResultSet rs = statement.executeQuery();
-			
-			// Extract all reimbursements and add to list
-			List<Reimbursement> reimbs = new ArrayList<>();
-			while (rs.next()) {
-				Reimbursement reimb = extractReimb(rs);
-				reimbs.add(reimb);
-			}
-			return reimbs;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-	
-	public List<Reimbursement> getAllReimbs() {
-		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursements";
+			String sql = "SELECT * FROM ers_reimbursements ORDER BY reimb_status_id ASC OFFSET ? LIMIT 10";
+			int offset = 10 * pageNum;
 			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, offset);
 			ResultSet rs = ps.executeQuery();
 
 			// Extract all reimbursements and add to list
@@ -124,7 +67,7 @@ public class ReimbursementDao {
 			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-			
+
 			// Check if reimbursement was found
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
@@ -134,23 +77,22 @@ public class ReimbursementDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
 	public int createReimb(Reimbursement reimb) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "INSERT INTO ers_reimbursements"
-					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_receipt, reimb_author, reimb_status_id, reimb_type_id)"
-					+ " VALUES(?, ?, ?, ?, ?, ?, ?)";
+					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_author, reimb_status_id, reimb_type_id)"
+					+ " VALUES(?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setBigDecimal(1, reimb.getAmount());
 			ps.setObject(2, LocalDateTime.now());
 			ps.setString(3, reimb.getDescription());
-			ps.setObject(4, reimb.getReceipt());
-			ps.setInt(5, reimb.getAuthorId()); 
-			ps.setInt(6, 1);
-			ps.setInt(7, reimb.getReimbTypeId());
+			ps.setInt(4, reimb.getAuthorId());
+			ps.setInt(5, 1);
+			ps.setInt(6, reimb.getReimbTypeId());
 
 			int createCount = ps.executeUpdate();
 			return createCount;
@@ -167,19 +109,19 @@ public class ReimbursementDao {
 					+ "SET reimb_resolved = ?, reimb_resolver = ?, reimb_status_id = ? "
 					+ "WHERE reimb_id = ? RETURNING reimb_resolved, reimb_resolver, reimb_status_id";
 			PreparedStatement ps = conn.prepareStatement(sql);
-			
+
 			ps.setObject(1, LocalDateTime.now());
 			ps.setInt(2, reimb.getResolverId());
 			ps.setInt(3, reimb.getReimbStatusId());
 			ps.setInt(4, id);
-			
+
 			// Check if reimbursement was updated
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				LocalDateTime resolved = rs.getTimestamp("reimb_resolved").toLocalDateTime();
 				int resolverId = rs.getInt("reimb_resolver");
 				int statusId = rs.getInt("reimb_status_id");
-				
+
 				reimb.setResolved(resolved);
 				reimb.setResolverId(resolverId);
 				reimb.setReimbStatusId(statusId);
@@ -188,7 +130,7 @@ public class ReimbursementDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
@@ -202,7 +144,7 @@ public class ReimbursementDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return 0;
 	}
 
@@ -217,7 +159,7 @@ public class ReimbursementDao {
 		int resolverId = rs.getInt("reimb_resolver");
 		int statusId = rs.getInt("reimb_status_id");
 		int reimbTypeId = rs.getInt("reimb_type_id");
-		
+
 		// If reimbursement was already resolved (not null), convert it to LocalDateTime
 		LocalDateTime resolvedLDT = null;
 		if (resolved != null)

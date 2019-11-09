@@ -31,9 +31,9 @@ public class ReimbursementController extends Controller {
 			throws JsonParseException, JsonMappingException, IOException {
 		String url = req.getRequestURI();
 		String[] parse = url.split("/");
-		String reimbStatus = "";
 		int reimbId = 0;
 		int userId = 0;
+		int pageNum = -1;
 
 		// Set CORS access
 		resp.setHeader("Access-Control-Allow-Origin", "*");
@@ -43,28 +43,22 @@ public class ReimbursementController extends Controller {
 				"Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
 		// Check for additional parameters in URI after 'reimbursements'
-		if (parse.length > 3 && parse[3].matches(".*\\d.*"))
+		if (parse.length > 3 && parse[3].startsWith("page="))
+			pageNum = Integer.parseInt(parse[3].replaceAll("[\\D]", ""));
+		else if (parse.length > 3 && parse[3].matches(".*\\d.*"))
 			reimbId = Integer.parseInt(parse[3]);
 		else if (parse.length > 4 && parse[3].matches("user") && parse[4].matches(".*\\d.*"))
 			userId = Integer.parseInt(parse[4].replaceAll("[\\D]", ""));
-		else if (parse.length > 3 && parse[3].matches("[a-zA-Z]+"))
-			reimbStatus = parse[3].toLowerCase();
-
+		
 		// Call associated handler using request method
 		switch (req.getMethod()) {
 		case "GET":
-			if (reimbStatus.equals("pending"))
-				handleGetPendingReimbs(req, resp);
-			else if (reimbStatus.equals("approved"))
-				handleGetApprovedReimbs(req, resp);
-			else if (reimbStatus.equals("denied"))
-				handleGetDeniedReimbs(req, resp);
+			if (pageNum > -1)
+				handleGetAllReimbs(req, resp, pageNum);
 			else if (userId != 0)
 				handleGetUserReimbs(req, resp, userId);
 			else if (reimbId != 0)
 				handleGet(req, resp, reimbId);
-			else if (parse[2].equals("reimbursements"))
-				handleGetAllReimbs(req, resp);
 			break;
 		case "POST":
 			if (parse[2].equals("reimbursements"))
@@ -79,59 +73,14 @@ public class ReimbursementController extends Controller {
 		}
 	}
 
-	private void handleGetAllReimbs(HttpServletRequest req, HttpServletResponse resp)
+	private void handleGetAllReimbs(HttpServletRequest req, HttpServletResponse resp, int pageNum)
 			throws JsonGenerationException, JsonMappingException, IOException {
-		List<Reimbursement> reimbs = rs.getAllReimbs();
+		List<Reimbursement> reimbs = rs.getAllReimbs(pageNum);
 
 		// Set status and write json object
 		if (reimbs != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), reimbs);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
-		}
-	}
-
-	private void handleGetPendingReimbs(HttpServletRequest req, HttpServletResponse resp)
-			throws JsonGenerationException, JsonMappingException, IOException {
-		List<Reimbursement> reimbs = rs.getPendingReimbs();
-
-		// Set status and write json object
-		if (reimbs != null) {
-			resp.setStatus(201);
-			om.writeValue(resp.getWriter(), reimbs);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
-		}
-	}
-
-	private void handleGetApprovedReimbs(HttpServletRequest req, HttpServletResponse resp)
-			throws JsonGenerationException, JsonMappingException, IOException {
-		List<Reimbursement> reimbs = rs.getApprovedReimbs();
-
-		// Set status and write json object
-		if (reimbs != null) {
-			resp.setStatus(201);
-			om.writeValue(resp.getWriter(), reimbs);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
-		}
-	}
-
-	private void handleGetDeniedReimbs(HttpServletRequest req, HttpServletResponse resp)
-			throws JsonGenerationException, JsonMappingException, IOException {
-		List<Reimbursement> reimbs = rs.getDeniedReimbs();
-
-		// Set status and write json object
-		if (reimbs != null) {
-			resp.setStatus(201);
-			om.writeValue(resp.getWriter(), reimbs);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "No reimbursement tickets available");
 		}
 	}
 
@@ -143,9 +92,6 @@ public class ReimbursementController extends Controller {
 		if (reimbs != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), reimbs);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "No reimbursement tickets available for this user");
 		}
 	}
 
@@ -157,9 +103,6 @@ public class ReimbursementController extends Controller {
 		if (reimb != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), reimb);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "Could not retrieve the reimbursement");
 		}
 	}
 
@@ -172,9 +115,6 @@ public class ReimbursementController extends Controller {
 		if (createCount > 0) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), reimb);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "Failed to submit the reimbursement ticket");
 		}
 	}
 
@@ -187,9 +127,6 @@ public class ReimbursementController extends Controller {
 		if (reimb != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), reimb);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "Failed to update the reimbursement ticket");
 		}
 	}
 

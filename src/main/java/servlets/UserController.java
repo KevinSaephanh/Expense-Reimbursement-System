@@ -68,9 +68,6 @@ public class UserController extends Controller {
 		if (user != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), user);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "Could not retrieve user");
 		}
 	}
 
@@ -82,9 +79,6 @@ public class UserController extends Controller {
 		if (users != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), users);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "No users in the database");
 		}
 	}
 
@@ -97,9 +91,6 @@ public class UserController extends Controller {
 		if (user != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), user);
-		} else {
-			resp.setStatus(400);
-			// Write some meaningful json object
 		}
 	}
 
@@ -112,12 +103,9 @@ public class UserController extends Controller {
 		if (user != null) {
 			// Generate token
 			String token = AuthUtil.generateToken(user);
-			
+
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), token);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "Incorrect username/password");
 		}
 	}
 
@@ -130,9 +118,6 @@ public class UserController extends Controller {
 		if (user != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), user);
-		} else {
-			resp.setStatus(400);
-			om.writeValue(resp.getWriter(), "User could not be updated");
 		}
 	}
 

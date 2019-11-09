@@ -14,10 +14,6 @@ import java.util.List;
 import models.Reimbursement;
 import utils.ConnectionUtil;
 
-// Use pagination when getting ALL reimbursements (because the dataset may be too large)
-// SELECT * FROM ers_reimbursements LIMIT 20 OFFSET (page_num taken from parameter * LIMIT SIZE)
-// When user selects next on some table/list, a query will be sent to the server to query another
-// paginated data set (i.e. the next 20 reimbursement tickets)
 public class ReimbursementDao {
 	public List<Reimbursement> getUserReimbs(int id) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
@@ -101,6 +97,21 @@ public class ReimbursementDao {
 		}
 
 		return 0;
+	}
+
+	public Blob saveReceipt(Blob receipt, int id) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
+			String sql = "UPDATE ers_reimbursements SET reimb_receipt = ? WHERE reimb_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setObject(1, receipt);
+			ps.setInt(2, id);
+			ps.executeUpdate();
+			return receipt;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public Reimbursement updateReimb(Reimbursement reimb, int id) {

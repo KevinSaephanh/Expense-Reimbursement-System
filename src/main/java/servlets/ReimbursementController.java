@@ -49,7 +49,7 @@ public class ReimbursementController extends Controller {
 			reimbId = Integer.parseInt(parse[3]);
 		else if (parse.length > 4 && parse[3].matches("user") && parse[4].matches(".*\\d.*"))
 			userId = Integer.parseInt(parse[4].replaceAll("[\\D]", ""));
-		
+
 		// Call associated handler using request method
 		switch (req.getMethod()) {
 		case "GET":
@@ -121,12 +121,19 @@ public class ReimbursementController extends Controller {
 	private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, int id)
 			throws JsonParseException, JsonMappingException, IOException {
 		Reimbursement reimb = om.readValue(req.getReader(), Reimbursement.class);
-		reimb = rs.updateReimb(reimb, id);
 
-		// Set status and write json object
-		if (reimb != null) {
-			resp.setStatus(201);
-			om.writeValue(resp.getWriter(), reimb);
+		// Check if resolver is the same as the author
+		if (reimb.getResolverId() == reimb.getAuthorId()) {
+			resp.setStatus(400);
+			om.writeValue(resp.getWriter(), "Authors cannot resolve their own reimbursement tickets!");
+		} else {
+			reimb = rs.updateReimb(reimb, id);
+
+			// Set status and write json object
+			if (reimb != null) {
+				resp.setStatus(201);
+				om.writeValue(resp.getWriter(), reimb);
+			}
 		}
 	}
 

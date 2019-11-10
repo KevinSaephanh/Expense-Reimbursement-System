@@ -1,5 +1,6 @@
 package services;
 
+import java.sql.Blob;
 import java.util.List;
 
 import dao.ReimbursementDao;
@@ -24,13 +25,18 @@ public class ReimbursementService {
 		return reimb;
 	}
 	
-	public int createReimb(Reimbursement reimb) {
+	public Reimbursement createReimb(Reimbursement reimb) {
 		// Validate amount input
 		if (!InputUtil.isValidAmount(reimb.getAmount()))
-			return 0;
+			return null;
 		
-		int createCount = reimbDao.createReimb(reimb);
-		return createCount;
+		reimb = reimbDao.createReimb(reimb);
+		return reimb;
+	}
+	
+	public Blob uploadReceipt(Blob receipt, int id) {
+		Blob uploadedReceipt = reimbDao.uploadReceipt(receipt, id);
+		return uploadedReceipt;
 	}
 	
 	public Reimbursement updateReimb(Reimbursement reimb, int id) {

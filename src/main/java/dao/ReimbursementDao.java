@@ -38,7 +38,7 @@ public class ReimbursementDao {
 
 	public List<Reimbursement> getAllReimbs(int pageNum) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursements ORDER BY reimb_status_id ASC OFFSET ? LIMIT 10";
+			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_status_id < 2 ORDER BY reimb_status_id ASC OFFSET ? LIMIT 10";
 			int offset = 10 * pageNum;
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, offset);
@@ -77,11 +77,11 @@ public class ReimbursementDao {
 		return null;
 	}
 
-	public int createReimb(Reimbursement reimb) {
+	public Reimbursement createReimb(Reimbursement reimb) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "INSERT INTO ers_reimbursements"
 					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_author, reimb_status_id, reimb_type_id)"
-					+ " VALUES(?, ?, ?, ?, ?, ?)";
+					+ " VALUES(?, ?, ?, ?, ?, ?) RETURNING reimb_id";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setBigDecimal(1, reimb.getAmount());
 			ps.setObject(2, LocalDateTime.now());
@@ -90,16 +90,18 @@ public class ReimbursementDao {
 			ps.setInt(5, 1);
 			ps.setInt(6, reimb.getReimbTypeId());
 
-			int createCount = ps.executeUpdate();
-			return createCount;
+			ResultSet rs = ps.executeQuery();
+			if (rs.next())
+				reimb.setId(rs.getInt("reimb_id"));
+			return reimb;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return 0;
+		return null;
 	}
 
-	public Blob saveReceipt(Blob receipt, int id) {
+	public Blob uploadReceipt(Blob receipt, int id) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "UPDATE ers_reimbursements SET reimb_receipt = ? WHERE reimb_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);

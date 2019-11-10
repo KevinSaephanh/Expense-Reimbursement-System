@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.sql.Blob;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +64,10 @@ public class ReimbursementController extends Controller {
 		case "POST":
 			if (parse[2].equals("reimbursements"))
 				handleCreate(req, resp);
+			else if (parse[3].equals("receipt") && parse[4].startsWith("ticket=")) {
+				reimbId = Integer.parseInt(parse[4].replaceAll("[\\D]", ""));
+				handleUploadReceipt(req, resp, reimbId);	
+			}
 			break;
 		case "PUT":
 			handleUpdate(req, resp, reimbId);
@@ -109,12 +114,24 @@ public class ReimbursementController extends Controller {
 	private void handleCreate(HttpServletRequest req, HttpServletResponse resp)
 			throws JsonParseException, JsonMappingException, IOException {
 		Reimbursement reimb = om.readValue(req.getReader(), Reimbursement.class);
-		int createCount = rs.createReimb(reimb);
+		reimb = rs.createReimb(reimb);
 
 		// Set status and write json object
-		if (createCount > 0) {
+		if (reimb != null) {
 			resp.setStatus(201);
 			om.writeValue(resp.getWriter(), reimb);
+		}
+	}
+	
+	private void handleUploadReceipt(HttpServletRequest req, HttpServletResponse resp, int id)
+			throws JsonParseException, JsonMappingException, IOException {
+		Blob receipt = om.readValue(req.getReader(), Blob.class);
+		receipt = rs.uploadReceipt(receipt, id);
+		
+		// Set status and write json object
+		if (receipt != null) {
+			resp.setStatus(201);
+			om.writeValue(resp.getWriter(), receipt);
 		}
 	}
 

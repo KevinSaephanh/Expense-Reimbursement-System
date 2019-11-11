@@ -84,8 +84,8 @@ public class ReimbursementDao {
 	public int createReimb(Reimbursement reimb) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "INSERT INTO ers_reimbursements"
-					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_author, reimb_status_id, reimb_type_id)"
-					+ " VALUES(?, ?, ?, ?, ?, ?)";
+					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_author, reimb_status_id, reimb_type_id, reimb_image_url)"
+					+ " VALUES(?, ?, ?, ?, ?, ?,?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setBigDecimal(1, reimb.getAmount());
 			ps.setObject(2, LocalDateTime.now());
@@ -93,6 +93,7 @@ public class ReimbursementDao {
 			ps.setInt(4, reimb.getAuthorId());
 			ps.setInt(5, 1);
 			ps.setInt(6, reimb.getReimbTypeId());
+			ps.setString(7, reimb.getReimbImgString());
 
 			int createCount = ps.executeUpdate();
 			return createCount;

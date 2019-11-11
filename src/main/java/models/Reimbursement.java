@@ -15,6 +15,16 @@ public class Reimbursement {
 	private int resolverId;
 	private int reimbTypeId;
 	private int reimbStatusId;
+	private String reimbImgString;
+
+
+	public String getReimbImgString() {
+		return reimbImgString;
+	}
+
+	public void setReimbImgString(String reimbImgString) {
+		this.reimbImgString = reimbImgString;
+	}
 
 	public Reimbursement() {
 

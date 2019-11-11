@@ -9,9 +9,29 @@
   	<servlet-name>FrontController</servlet-name>
   	<servlet-class>servlets.FrontController</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>S3Uploader</servlet-name>
+  	<display-name>S3Uploader</display-name>
+  	<description></description>
+  	<servlet-class>servlets.S3Uploader</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>SSSUPloader</servlet-name>
+  	<display-name>SSSUPloader</display-name>
+  	<description></description>
+  	<servlet-class>servlets.SSSUPloader</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>FrontController</servlet-name>
   	<url-pattern>/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>S3Uploader</servlet-name>
+  	<url-pattern>/S3Uploader</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>SSSUPloader</servlet-name>
+  	<url-pattern>/SSSUPloader</url-pattern>
   </servlet-mapping>
 </web-app>

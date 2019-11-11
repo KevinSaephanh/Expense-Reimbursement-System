@@ -43,7 +43,8 @@ create table if not exists ers_reimbursements(
 	reimb_author integer references ers_users(user_id) not null,
 	reimb_resolver integer references ers_users(user_id),
 	reimb_status_id integer references ers_reimbursement_status(reimb_status_id) not null,
-	reimb_type_id integer references ers_reimbursement_type(reimb_type_id) not null
+	reimb_type_id integer references ers_reimbursement_type(reimb_type_id) not null,
+	reimb_image_url text
 );
 
 create table if not exists ers_reimbursement_type(

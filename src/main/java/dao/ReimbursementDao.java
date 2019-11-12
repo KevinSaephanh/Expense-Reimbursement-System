@@ -14,10 +14,6 @@ import java.util.List;
 import models.Reimbursement;
 import utils.ConnectionUtil;
 
-// Use pagination when getting ALL reimbursements (because the dataset may be too large)
-// SELECT * FROM ers_reimbursements LIMIT 20 OFFSET (page_num taken from parameter * LIMIT SIZE)
-// When user selects next on some table/list, a query will be sent to the server to query another
-// paginated data set (i.e. the next 20 reimbursement tickets)
 public class ReimbursementDao {
 	public List<Reimbursement> getUserReimbs(int id) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
@@ -42,7 +38,7 @@ public class ReimbursementDao {
 
 	public List<Reimbursement> getAllReimbs(int pageNum) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM ers_reimbursements ORDER BY reimb_status_id ASC OFFSET ? LIMIT 10";
+			String sql = "SELECT * FROM ers_reimbursements WHERE reimb_status_id < 2 ORDER BY reimb_status_id ASC OFFSET ? LIMIT 10";
 			int offset = 10 * pageNum;
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, offset);
@@ -81,7 +77,7 @@ public class ReimbursementDao {
 		return null;
 	}
 
-	public int createReimb(Reimbursement reimb) {
+	public Reimbursement createReimb(Reimbursement reimb) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "INSERT INTO ers_reimbursements"
 					+ "(reimb_amount, reimb_submitted, reimb_description, reimb_author, reimb_status_id, reimb_type_id, reimb_image_url)"
@@ -95,13 +91,30 @@ public class ReimbursementDao {
 			ps.setInt(6, reimb.getReimbTypeId());
 			ps.setString(7, reimb.getReimbImgString());
 
-			int createCount = ps.executeUpdate();
-			return createCount;
+			ResultSet rs = ps.executeQuery();
+			if (rs.next())
+				reimb.setId(rs.getInt("reimb_id"));
+			return reimb;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return 0;
+		return null;
+	}
+
+	public Blob uploadReceipt(Blob receipt, int id) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
+			String sql = "UPDATE ers_reimbursements SET reimb_receipt = ? WHERE reimb_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setObject(1, receipt);
+			ps.setInt(2, id);
+			ps.executeUpdate();
+			return receipt;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public Reimbursement updateReimb(Reimbursement reimb, int id) {

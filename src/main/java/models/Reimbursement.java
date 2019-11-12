@@ -31,7 +31,7 @@ public class Reimbursement {
 	}
 
 	public Reimbursement(int id, BigDecimal amount, LocalDateTime submitted, LocalDateTime resolved, String description,
-			Blob receipt, int authorId, int resolverId, int reimbTypeId, int reimbStatusId) {
+			Blob receipt, int authorId, int resolverId, int reimbTypeId, int reimbStatusId, String reimbImgString) {
 		super();
 		this.id = id;
 		this.amount = amount;
@@ -43,6 +43,7 @@ public class Reimbursement {
 		this.resolverId = resolverId;
 		this.reimbTypeId = reimbTypeId;
 		this.reimbStatusId = reimbStatusId;
+		this.reimbImgString = reimbImgString;
 	}
 
 	public int getId() {
